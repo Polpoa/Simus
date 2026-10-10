@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulações de Física — Índice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a1120; --bg-panel: #121b2e; --bg-panel-2: #0e1626;
+    --line: rgba(201,162,39,0.18); --line-strong: rgba(201,162,39,0.4);
+    --brass: #c9a227; --brass-dim: #8a7226;
+    --text: #e8ecf3; --text-dim: #8b96ac;
+    --amber:#ffb020; --cyan:#4fd1e8; --green:#3ddc84; --pink:#ff9ecb; --violet:#b98aff;
+    --radius: 12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(79,209,232,0.06), transparent 60%),
+      radial-gradient(1000px 500px at 90% 0%, rgba(255,176,32,0.05), transparent 55%),
+      var(--bg);
+    color:var(--text); font-family:'Inter',system-ui,sans-serif; min-height:100vh; padding:40px 18px 60px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--brass);margin:0 0 10px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(28px,4vw,40px);margin:0 0 10px;letter-spacing:-0.01em;}
+  .lead{color:var(--text-dim);max-width:600px;font-size:15px;line-height:1.6;margin:0 0 36px;}
+
+  .group-title{
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;text-transform:uppercase;
+    letter-spacing:0.08em;color:var(--text-dim);margin:34px 0 14px;border-bottom:1px solid var(--line);padding-bottom:8px;
+  }
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:640px){ .grid{grid-template-columns:1fr;} }
+
+  a.card{
+    display:block;text-decoration:none;color:inherit;
+    background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;transition:border-color .15s, transform .15s;
+  }
+  a.card:hover{border-color:var(--line-strong);transform:translateY(-1px);}
+  a.card .tag{
+    display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--bg);
+    background:var(--dot,var(--amber));border-radius:999px;padding:3px 10px;margin-bottom:10px;font-weight:600;
+  }
+  a.card h3{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0 0 6px;color:var(--text);}
+  a.card p{font-size:12.5px;color:var(--text-dim);margin:0;line-height:1.5;}
+  a.card .arrow{float:right;color:var(--text-dim);font-family:'JetBrains Mono',monospace;}
+
+  footer{margin-top:48px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Física · Ensino Médio &amp; Pré-vestibular</p>
+  <h1>Simulações interativas</h1>
+  <p class="lead">Abra direto pelo navegador, no computador ou no celular — nenhuma delas precisa de instalação ou internet depois de carregada uma vez.</p>
+
+  <div class="group-title">Óptica — Refração</div>
+  <div class="grid">
+    <a class="card" href="refracao.html" style="--dot:var(--cyan)">
+      <span class="arrow">→</span>
+      <span class="tag">Refração</span>
+      <h3>Lei de Snell, lâminas e dioptro plano</h3>
+      <p>Ângulos, índices de refração, desvio lateral em lâmina de faces paralelas e profundidade aparente.</p>
+    </a>
+  </div>
+
+  <div class="group-title">Óptica — Espelhos esféricos</div>
+  <div class="grid">
+    <a class="card" href="espelhos-raios.html" style="--dot:var(--amber)">
+      <span class="arrow">→</span>
+      <span class="tag">Módulo 1</span>
+      <h3>Raios notáveis</h3>
+      <p>Reflexão real na superfície esférica — aberração de verdade, com modo paraxial opcional.</p>
+    </a>
+    <a class="card" href="espelhos-imagem.html" style="--dot:var(--amber)">
+      <span class="arrow">→</span>
+      <span class="tag">Módulo 2</span>
+      <h3>Formação de imagem</h3>
+      <p>Objeto-seta, equação de Gauss, ampliação e tamanhos em tempo real.</p>
+    </a>
+    <a class="card" href="espelhos-dois-espelhos.html" style="--dot:var(--amber)">
+      <span class="arrow">→</span>
+      <span class="tag">Módulo 3</span>
+      <h3>Sistema de dois espelhos</h3>
+      <p>A imagem do 1º espelho vira objeto do 2º — reflexões sucessivas, inclusive objeto virtual.</p>
+    </a>
+  </div>
+
+  <div class="group-title">Óptica — Lentes esféricas</div>
+  <div class="grid">
+    <a class="card" href="lentes.html" style="--dot:var(--violet)">
+      <span class="arrow">→</span>
+      <span class="tag">Lentes</span>
+      <h3>Formação de imagens em lentes delgadas</h3>
+      <p>Convergente e divergente, os 4 raios notáveis (incluindo antiprincipal) e opção de 2ª lente.</p>
+    </a>
+  </div>
+
+  <div class="group-title">Eletricidade</div>
+  <div class="grid">
+    <a class="card" href="eletricidade.html" style="--dot:var(--green)">
+      <span class="arrow">→</span>
+      <span class="tag">Circuitos</span>
+      <h3>Leis de Ohm e bancada de circuitos</h3>
+      <p>Gráficos da 1ª lei, geometria da 2ª lei, e montagem livre de circuitos com fusível, LED e curto-circuito.</p>
+    </a>
+  </div>
+
+  <footer>Prof. Polpoa · material de apoio para aulas online</footer>
+</div>
+</body>
+</html>

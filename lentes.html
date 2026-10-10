@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lentes Esféricas — Formação de Imagens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a1120; --bg-panel: #121b2e; --bg-panel-2: #0e1626;
+    --line: rgba(201,162,39,0.18); --line-strong: rgba(201,162,39,0.4);
+    --brass: #c9a227; --brass-dim: #8a7226;
+    --text: #e8ecf3; --text-dim: #8b96ac;
+    --r1: #ffb020; --r2: #4fd1e8; --r3: #3ddc84; --r4: #b98aff;
+    --img2: #ff9ecb; --warn: #ff5470;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(79,209,232,0.06), transparent 60%),
+      radial-gradient(1000px 500px at 90% 0%, rgba(255,176,32,0.05), transparent 55%),
+      var(--bg);
+    color:var(--text); font-family:'Inter',system-ui,sans-serif; min-height:100vh; padding:28px 18px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+  header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:22px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--brass);margin:0 0 6px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(24px,3.4vw,36px);margin:0;letter-spacing:-0.01em;}
+  header.top p{color:var(--text-dim);max-width:480px;margin:8px 0 0;font-size:14px;line-height:1.5;}
+  .badge-row{display:flex;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);}
+  .badge{border:1px solid var(--line-strong);border-radius:999px;padding:5px 12px;white-space:nowrap;}
+
+  .panel{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;}
+  @media (max-width:900px){ .panel{grid-template-columns:1fr;} }
+
+  .stage{background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;}
+  .stage canvas{width:100%;height:auto;display:block;border-radius:6px;background:var(--bg-panel-2);touch-action:none;}
+  .stage-caption{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text-dim);line-height:1.6;}
+  .stage-caption b{color:var(--text);font-weight:600;}
+
+  .controls{background:var(--bg-panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:16px;max-height:1000px;overflow-y:auto;}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-dim);border-bottom:1px solid var(--line);padding-bottom:8px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--text);font-weight:500;}
+  .field label .val{font-family:'JetBrains Mono',monospace;color:var(--brass);font-size:13px;}
+  input[type="range"]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--brass-dim),var(--line));outline:none;}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--brass);border:2px solid #0a1120;cursor:pointer;box-shadow:0 0 0 3px rgba(201,162,39,0.15);}
+  input[type="range"]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--brass);border:2px solid #0a1120;cursor:pointer;}
+  select{width:100%;background:var(--bg-panel-2);color:var(--text);border:1px solid var(--line-strong);border-radius:6px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:13px;}
+  .readout{background:var(--bg-panel-2);border:1px solid var(--line-strong);border-radius:8px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;}
+  .readout .item{display:flex;flex-direction:column;gap:2px;}
+  .readout .k{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;}
+  .readout .v{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--r2);font-weight:600;}
+  .note{font-size:12.5px;color:var(--text-dim);line-height:1.55;}
+  .note b{color:var(--text);}
+  .raybox{display:flex;flex-direction:column;gap:8px;}
+  .raytoggle{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--bg-panel-2);cursor:pointer;}
+  .raytoggle input{width:16px;height:16px;accent-color:var(--brass);}
+  .raytoggle .dot{width:10px;height:10px;border-radius:50%;flex:none;}
+  .raytoggle span.lbl{font-size:12.5px;color:var(--text);}
+  .status-box{border-radius:8px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;border:1px solid var(--line-strong);background:var(--bg-panel-2);color:var(--text-dim);}
+  .status-box + .status-box{margin-top:-8px;}
+  .lensblock{border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px;}
+  .lensblock.off{opacity:0.45;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Óptica geométrica · lentes esféricas</p>
+      <h1>Formação de imagens em lentes delgadas</h1>
+      <p>Arraste a seta e as lentes. Os 4 raios notáveis convergem exatamente na imagem calculada por Gauss. Ative a 2ª lente para ver reflexões sucessivas: a imagem da 1ª vira objeto da 2ª.</p>
+    </div>
+    <div class="badge-row">
+      <span class="badge">Ensino Médio</span>
+      <span class="badge">Pré-vestibular</span>
+    </div>
+  </header>
+
+  <section class="panel">
+    <div class="stage">
+      <canvas id="cv" width="800" height="500"></canvas>
+      <p class="stage-caption">Arraste a ponta da <b style="color:#ffb020">seta laranja</b> (objeto) ou as lentes. Imagem 1 em <b style="color:#e8ecf3">branco</b>, imagem final em <b style="color:#ff9ecb">rosa</b> — tracejadas quando virtuais. <b>A</b> e <b>A'</b> são os pontos antiprincipais (a 2f).</p>
+    </div>
+    <div class="controls">
+      <div class="section-title">Lente 1</div>
+      <div class="lensblock">
+        <div class="field">
+          <label>Tipo</label>
+          <select id="tipoLente">
+            <option value="convergente">Convergente (bordas finas)</option>
+            <option value="divergente">Divergente (bordas grossas)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Distância focal (f₁) <span class="val" id="vF">15 cm</span></label>
+          <input type="range" id="fSlider" min="6" max="30" value="15">
+        </div>
+      </div>
+
+      <div class="section-title">Lente 2</div>
+      <label class="raytoggle"><input type="checkbox" id="usarL2"><i class="dot" style="background:var(--img2)"></i><span class="lbl">Adicionar segunda lente</span></label>
+      <div class="lensblock off" id="blocoL2">
+        <div class="field">
+          <label>Tipo</label>
+          <select id="tipoLente2">
+            <option value="convergente">Convergente (bordas finas)</option>
+            <option value="divergente">Divergente (bordas grossas)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Distância focal (f₂) <span class="val" id="vF2">12 cm</span></label>
+          <input type="range" id="fSlider2" min="6" max="30" value="12">
+        </div>
+      </div>
+
+      <div class="section-title">Raios notáveis</div>
+      <div class="raybox">
+        <label class="raytoggle"><input type="checkbox" id="ray1" checked><i class="dot" style="background:var(--r1)"></i><span class="lbl">Raio 1 — paralelo ao eixo → sai pelo foco imagem (F')</span></label>
+        <label class="raytoggle"><input type="checkbox" id="ray2" checked><i class="dot" style="background:var(--r2)"></i><span class="lbl">Raio 2 — rumo ao foco objeto (F) → emerge paralelo</span></label>
+        <label class="raytoggle"><input type="checkbox" id="ray3" checked><i class="dot" style="background:var(--r3)"></i><span class="lbl">Raio 3 — pelo centro óptico → sem desvio</span></label>
+        <label class="raytoggle"><input type="checkbox" id="ray4"><i class="dot" style="background:var(--r4)"></i><span class="lbl">Raio 4 — pelo antiprincipal A → sai por A'</span></label>
+      </div>
+
+      <div class="section-title">Medidas — Lente 1</div>
+      <div class="readout">
+        <div class="item"><span class="k">Focal (f₁)</span><span class="v" id="rF">—</span></div>
+        <div class="item"><span class="k">Dist. objeto (p₁)</span><span class="v" id="rP">—</span></div>
+        <div class="item"><span class="k">Dist. imagem (p₁')</span><span class="v" id="rPl">—</span></div>
+        <div class="item"><span class="k">Ampliação (A₁)</span><span class="v" id="rA">—</span></div>
+        <div class="item"><span class="k">Tamanho objeto (o)</span><span class="v" id="rO">—</span></div>
+        <div class="item"><span class="k">Tamanho imagem (i₁)</span><span class="v" id="rI">—</span></div>
+      </div>
+      <div class="status-box" id="statusBox"></div>
+
+      <div id="secaoL2" style="display:none;">
+        <div class="section-title">Medidas — Lente 2</div>
+        <div class="readout">
+          <div class="item"><span class="k">Focal (f₂)</span><span class="v" id="r2F">—</span></div>
+          <div class="item"><span class="k">Dist. objeto (p₂)</span><span class="v" id="r2P">—</span></div>
+          <div class="item"><span class="k">Dist. imagem (p₂')</span><span class="v" id="r2Pl">—</span></div>
+          <div class="item"><span class="k">Ampliação (A₂)</span><span class="v" id="r2A">—</span></div>
+          <div class="item"><span class="k">Ampliação total (A₁·A₂)</span><span class="v" id="rAt">—</span></div>
+          <div class="item"><span class="k">Tamanho imagem final</span><span class="v" id="rIf">—</span></div>
+        </div>
+        <div class="status-box" id="statusBox2"></div>
+      </div>
+
+      <div class="note">Pontos <b>antiprincipais</b> ficam a <b>2f</b> de cada lado (A no lado objeto, A' no lado imagem). Eles são pontos conjugados: todo raio que passa por A emerge passando por A' — e um objeto colocado em A forma imagem em A', do mesmo tamanho e invertida (A = −1).</div>
+      <div class="note">Convenção de Gauss: <b>f &gt; 0</b> convergente, <b>f &lt; 0</b> divergente. <b>p' &gt; 0</b> → real, lado oposto ao objeto. <b>p' &lt; 0</b> → virtual, mesmo lado. <b>p₂ &lt; 0</b> na 2ª lente significa <b>objeto virtual</b> (a imagem da 1ª caiu depois da 2ª lente).</div>
+    </div>
+  </section>
+</div>
+
+<script>
+function norm(v){ const m=Math.hypot(v.x,v.y)||1; return {x:v.x/m,y:v.y/m}; }
+function sub(a,b){ return {x:a.x-b.x,y:a.y-b.y}; }
+function add(a,b){ return {x:a.x+b.x,y:a.y+b.y}; }
+function scl(a,s){ return {x:a.x*s,y:a.y*s}; }
+function dot(a,b){ return a.x*b.x+a.y*b.y; }
+function fmt(x,d=1){ if(!isFinite(x)) return '∞'; return x.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+
+const canvas = document.getElementById('cv');
+const ctx = canvas.getContext('2d');
+const PXCM = 8;
+const axisY = 250;
+let lensX = 380;
+let lensX2 = 640;
+let objTip = {x:150, y:200};
+let dragging = null;
+let degenerateRays = [];
+const RAY_NAMES = {ray1:'Raio 1', ray2:'Raio 2', ray3:'Raio 3', ray4:'Raio 4 (antiprincipal)'};
+
+function getPos(e){
+  const rect = canvas.getBoundingClientRect();
+  const sx = canvas.width/rect.width, sy = canvas.height/rect.height;
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  return {x:(cx-rect.left)*sx, y:(cy-rect.top)*sy};
+}
+function drawArrow(base, tip, color, dashed){
+  ctx.save();
+  if(dashed) ctx.setLineDash([6,5]);
+  ctx.strokeStyle=color; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(base.x,base.y); ctx.lineTo(tip.x,tip.y); ctx.stroke();
+  ctx.setLineDash([]);
+  const ang = Math.atan2(tip.y-base.y, tip.x-base.x);
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.moveTo(tip.x,tip.y);
+  ctx.lineTo(tip.x-11*Math.cos(ang-0.3), tip.y-11*Math.sin(ang-0.3));
+  ctx.lineTo(tip.x-11*Math.cos(ang+0.3), tip.y-11*Math.sin(ang+0.3));
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function drawSeg(color, A, B, dashed){
+  ctx.save();
+  if(dashed){ ctx.setLineDash([5,5]); ctx.strokeStyle=color+'aa'; } else { ctx.strokeStyle=color; }
+  ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+// Extend a ray from P along dir until it leaves the canvas, so refracted rays
+// continue PAST the image point instead of stopping at it (light doesn't stop there).
+function extendToEdge(P, dir){
+  const W = canvas.width, H = canvas.height;
+  let best = Infinity;
+  if(Math.abs(dir.x) > 1e-9){
+    const t = dir.x > 0 ? (W-P.x)/dir.x : (0-P.x)/dir.x;
+    if(t > 0) best = Math.min(best, t);
+  }
+  if(Math.abs(dir.y) > 1e-9){
+    const t = dir.y > 0 ? (H-P.y)/dir.y : (0-P.y)/dir.y;
+    if(t > 0) best = Math.min(best, t);
+  }
+  if(!isFinite(best)) best = 900;
+  return add(P, scl(dir, best));
+}
+
+function marker(pt,label,color,dy){  ctx.beginPath(); ctx.arc(pt.x,pt.y,4,0,7); ctx.fillStyle=color; ctx.fill();
+  ctx.font="11px 'JetBrains Mono', monospace"; ctx.fillStyle=color;
+  ctx.fillText(label, pt.x+6, pt.y+(dy||-8));
+}
+function drawLensSymbol(x, convergente, half){
+  ctx.strokeStyle='#e8ecf3'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(x,axisY-half); ctx.lineTo(x,axisY+half); ctx.stroke();
+  function wing(y0, outward){
+    const dy = outward*15;
+    ctx.beginPath();
+    ctx.moveTo(x-13, y0+(convergente? dy : -dy));
+    ctx.lineTo(x, y0);
+    ctx.lineTo(x+13, y0+(convergente? dy : -dy));
+    ctx.stroke();
+  }
+  wing(axisY-half,-1); wing(axisY+half,1);
+}
+
+// Gauss for a lens: returns image data for an object point
+function imageOf(lx, f, tip){
+  const p = lx - tip.x;
+  const o = axisY - tip.y;
+  if(Math.abs(p-f) < 1.2) return {atInfinity:true, p, o};
+  const pPrime = (f*p)/(p-f);
+  const A = -pPrime/p;
+  const i = A*o;
+  return {atInfinity:false, p, o, pPrime, A, i,
+          pos:{x:lx+pPrime, y:axisY-i}, virtual: pPrime<0};
+}
+
+// Draw the notable rays from a tip through one lens toward its image.
+// A thin lens is an idealized PLANE: rays may legitimately strike it beyond the
+// drawn symbol, so we extend the plane with a dashed line instead of dropping them.
+function drawRays(lx, f, tip, res, colorOverride, lensHalf){
+  if(res.atInfinity){
+    const Q = {x:lx, y:tip.y};
+    const c = colorOverride||'#ffb020';
+    drawSeg(c, tip, Q, false);
+    drawSeg(c, Q, extendToEdge(Q, {x:1,y:0}), false);
+    return;
+  }
+  const F  = {x:lx-f, y:axisY};
+  const Fl = {x:lx+f, y:axisY};
+  const A  = {x:lx-2*f, y:axisY};
+  const Al = {x:lx+2*f, y:axisY};
+  const O  = {x:lx, y:axisY};
+  const keys = [];
+  if(document.getElementById('ray1').checked) keys.push('ray1');
+  if(document.getElementById('ray2').checked) keys.push('ray2');
+  if(document.getElementById('ray3').checked) keys.push('ray3');
+  if(document.getElementById('ray4').checked) keys.push('ray4');
+
+  // PASS 1 — compute where each ray meets the lens plane
+  const MAX_OFF = 420; // beyond this the ray is essentially parallel to the plane
+  const items = [];
+  keys.forEach(key=>{
+    let Q, dir, color;
+    if(key==='ray1'){
+      color = colorOverride || '#ffb020';
+      Q = {x:lx, y:tip.y};
+      dir = norm(sub(Fl,Q)); if(dir.x<0) dir = scl(dir,-1);
+    } else if(key==='ray2'){
+      color = colorOverride || '#4fd1e8';
+      const t0 = (lx-tip.x)/(F.x-tip.x);
+      if(!isFinite(t0)) return;
+      Q = add(tip, scl(sub(F,tip), t0));
+      dir = {x:1,y:0};
+    } else if(key==='ray3'){
+      color = colorOverride || '#3ddc84';
+      Q = O;
+      dir = norm(sub(O,tip)); if(dir.x<0) dir = scl(dir,-1);
+    } else {
+      color = colorOverride || '#b98aff';
+      const t0 = (lx-tip.x)/(A.x-tip.x);
+      if(!isFinite(t0)) return;
+      Q = add(tip, scl(sub(A,tip), t0));
+      dir = norm(sub(Al,Q)); if(dir.x<0) dir = scl(dir,-1);
+    }
+    if(!isFinite(Q.y) || Math.abs(Q.y-axisY) > MAX_OFF){
+      degenerateRays.push(key);
+      return;
+    }
+    items.push({Q, dir, color});
+  });
+
+  // PASS 2 — extend the lens plane (dashed) far enough to reach every incidence point
+  let needed = lensHalf;
+  items.forEach(it=> needed = Math.max(needed, Math.abs(it.Q.y-axisY)+10));
+  if(needed > lensHalf){
+    ctx.save();
+    ctx.setLineDash([4,6]);
+    ctx.strokeStyle='rgba(232,236,243,0.30)';
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(lx, axisY-needed); ctx.lineTo(lx, axisY-lensHalf);
+    ctx.moveTo(lx, axisY+lensHalf); ctx.lineTo(lx, axisY+needed);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // PASS 3 — draw the rays
+  items.forEach(({Q,dir,color})=>{
+    drawSeg(color, tip, Q, false);
+    if(!res.virtual){
+      // real image: the ray converges at the image and CONTINUES past it
+      const through = norm(sub(res.pos, Q));
+      drawSeg(color, Q, extendToEdge(Q, through), false);
+    } else {
+      // virtual image: the real ray diverges to the edge; the dashed
+      // backward extension is what appears to come from the image
+      drawSeg(color, Q, extendToEdge(Q, dir), false);
+      drawSeg(color, Q, res.pos, true);
+    }
+  });
+}
+
+function render(){
+  const W=canvas.width,H=canvas.height;
+  degenerateRays = [];
+  const conv1 = document.getElementById('tipoLente').value==='convergente';
+  const f1mag = parseFloat(document.getElementById('fSlider').value)*PXCM;
+  const f1 = conv1 ? f1mag : -f1mag;
+  document.getElementById('vF').textContent = document.getElementById('fSlider').value+' cm';
+
+  const usarL2 = document.getElementById('usarL2').checked;
+  const conv2 = document.getElementById('tipoLente2').value==='convergente';
+  const f2mag = parseFloat(document.getElementById('fSlider2').value)*PXCM;
+  const f2 = conv2 ? f2mag : -f2mag;
+  document.getElementById('vF2').textContent = document.getElementById('fSlider2').value+' cm';
+  document.getElementById('blocoL2').className = usarL2 ? 'lensblock' : 'lensblock off';
+  document.getElementById('secaoL2').style.display = usarL2 ? 'block' : 'none';
+
+  if(usarL2 && lensX2 - lensX < 90) lensX2 = lensX + 90;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='rgba(232,236,243,0.06)';
+  for(let x=20;x<W;x+=20) for(let y=20;y<H;y+=20){ ctx.beginPath(); ctx.arc(x,y,1,0,7); ctx.fill(); }
+  ctx.setLineDash([10,6,2,6]); ctx.strokeStyle='rgba(232,236,243,0.3)'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(0,axisY); ctx.lineTo(W,axisY); ctx.stroke(); ctx.setLineDash([]);
+
+  drawLensSymbol(lensX, conv1, 150);
+  if(usarL2) drawLensSymbol(lensX2, conv2, 120);
+
+  // lens 1 cardinal points
+  marker({x:lensX,y:axisY},'O','#e8ecf3');
+  marker({x:lensX-f1,y:axisY},'F','#c9a227');
+  marker({x:lensX+f1,y:axisY},"F'",'#c9a227');
+  marker({x:lensX-2*f1,y:axisY},'A','#b98aff',14);
+  marker({x:lensX+2*f1,y:axisY},"A'",'#b98aff',14);
+  if(usarL2){
+    marker({x:lensX2,y:axisY},'O₂','#e8ecf3');
+    marker({x:lensX2-f2,y:axisY},'F₂','#c9a227');
+    marker({x:lensX2+f2,y:axisY},"F₂'",'#c9a227');
+  }
+
+  // clamp object
+  let p = lensX - objTip.x;
+  let o = axisY - objTip.y;
+  if(Math.abs(o) < 6) o = o>=0?6:-6;
+  if(p < 10) p = 10;
+  objTip = {x:lensX-p, y:axisY-o};
+  drawArrow({x:lensX-p,y:axisY}, objTip, '#ffb020', false);
+
+  const res1 = imageOf(lensX, f1, objTip);
+  drawRays(lensX, f1, objTip, res1, null, 150);
+
+  const box = document.getElementById('statusBox');
+  document.getElementById('rF').textContent = fmt(f1/PXCM,1)+' cm';
+  document.getElementById('rP').textContent = fmt(p/PXCM,1)+' cm';
+  document.getElementById('rO').textContent = fmt(Math.abs(o)/PXCM,1)+' cm';
+
+  if(res1.atInfinity){
+    document.getElementById('rPl').textContent='∞';
+    document.getElementById('rA').textContent='—';
+    document.getElementById('rI').textContent='—';
+    box.innerHTML = `📏 Objeto no foco (p₁ ≈ f₁): imagem imprópria, no infinito.`;
+    if(usarL2){
+      ['r2F','r2P','r2Pl','r2A','rAt','rIf'].forEach(id=>document.getElementById(id).textContent='—');
+      document.getElementById('statusBox2').innerHTML = `A 1ª lente não forma imagem definida, então não há objeto para a 2ª lente.`;
+    }
+  } else {
+    drawArrow({x:lensX+res1.pPrime,y:axisY}, res1.pos, '#e8ecf3', res1.virtual);
+    document.getElementById('rPl').textContent = fmt(res1.pPrime/PXCM,1)+' cm';
+    document.getElementById('rA').textContent = fmt(res1.A,2)+'×';
+    document.getElementById('rI').textContent = fmt(Math.abs(res1.i)/PXCM,1)+' cm';
+    const nat1 = res1.virtual ? 'virtual (mesmo lado do objeto)' : 'real (lado oposto)';
+    const ori1 = res1.A>0 ? 'em pé' : 'invertida';
+    const tam1 = Math.abs(res1.A)>1.001 ? 'maior' : (Math.abs(res1.A)<0.999?'menor':'igual');
+    box.innerHTML = `🖼 Imagem 1: <b>${nat1}</b>, <b>${ori1}</b>, <b>${tam1}</b> (|A₁| = ${fmt(Math.abs(res1.A),2)}).`;
+
+    if(usarL2){
+      const res2 = imageOf(lensX2, f2, res1.pos);
+      const box2 = document.getElementById('statusBox2');
+      document.getElementById('r2F').textContent = fmt(f2/PXCM,1)+' cm';
+      if(res2.atInfinity){
+        document.getElementById('r2P').textContent = fmt(res2.p/PXCM,1)+' cm';
+        ['r2Pl','r2A','rAt','rIf'].forEach(id=>document.getElementById(id).textContent='—');
+        box2.innerHTML = `📏 A imagem final se forma no infinito (a imagem 1 caiu no foco da 2ª lente).`;
+      } else {
+        drawRays(lensX2, f2, res1.pos, res2, '#ff9ecb', 120);
+        drawArrow({x:lensX2+res2.pPrime,y:axisY}, res2.pos, '#ff9ecb', res2.virtual);
+        const At = res1.A*res2.A;
+        document.getElementById('r2P').textContent = fmt(res2.p/PXCM,1)+' cm';
+        document.getElementById('r2Pl').textContent = fmt(res2.pPrime/PXCM,1)+' cm';
+        document.getElementById('r2A').textContent = fmt(res2.A,2)+'×';
+        document.getElementById('rAt').textContent = fmt(At,2)+'×';
+        document.getElementById('rIf').textContent = fmt(Math.abs(At*o)/PXCM,1)+' cm';
+        const nat2 = res2.virtual ? 'virtual' : 'real';
+        const ori2 = At>0 ? 'em pé em relação ao objeto original' : 'invertida em relação ao objeto original';
+        const alerta = res2.p<0 ? ` ⚠ objeto virtual para a 2ª lente (p₂ &lt; 0).` : '';
+        box2.innerHTML = `🖼 Imagem final: <b>${nat2}</b>, <b>${ori2}</b>, |A total| = ${fmt(Math.abs(At),2)}.${alerta}`;
+      }
+    }
+  }
+
+  if(degenerateRays.length){
+    const nomes = [...new Set(degenerateRays)].map(k=>RAY_NAMES[k]).join(', ');
+    const aviso = `<br>⚠ ${nomes}: nesta posição o raio fica quase paralelo ao plano da lente e incidiria muito longe do eixo. Afaste o objeto do ponto antiprincipal para visualizá-lo.`;
+    const alvo = document.getElementById('statusBox');
+    alvo.innerHTML = alvo.innerHTML + aviso;
+  }
+
+  ctx.strokeStyle='#e8ecf3'; ctx.lineWidth=1.5;
+  ctx.strokeRect(lensX-5, axisY-5, 10,10);
+  if(usarL2) ctx.strokeRect(lensX2-5, axisY-5, 10,10);
+}
+
+canvas.addEventListener('pointerdown',(e)=>{
+  const pos = getPos(e);
+  if(Math.hypot(pos.x-objTip.x,pos.y-objTip.y)<16){ dragging='tip'; return; }
+  if(Math.abs(pos.x-lensX)<14 && Math.abs(pos.y-axisY)<160){ dragging='lens'; return; }
+  if(document.getElementById('usarL2').checked && Math.abs(pos.x-lensX2)<14 && Math.abs(pos.y-axisY)<130){ dragging='lens2'; return; }
+});
+canvas.addEventListener('pointermove',(e)=>{
+  if(!dragging) return;
+  const pos = getPos(e);
+  if(dragging==='tip') objTip = pos;
+  if(dragging==='lens') lensX = pos.x;
+  if(dragging==='lens2') lensX2 = pos.x;
+  render();
+});
+canvas.addEventListener('pointerup',()=>{ dragging=null; });
+canvas.addEventListener('pointerleave',()=>{ dragging=null; });
+
+['tipoLente','fSlider','tipoLente2','fSlider2','usarL2','ray1','ray2','ray3','ray4'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', render);
+});
+
+render();
+</script>
+</body>
+</html>
